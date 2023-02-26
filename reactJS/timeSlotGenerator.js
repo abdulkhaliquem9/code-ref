@@ -10,8 +10,10 @@ const genTS = (data) => {
     restrictedStartTime = '7:00:01 AM',
     restrictedEndTime = '7:59:59 AM',
     cookingTime = 45,
+    restrictedDay = 'Wednesday',
   } = data;
   const hour = 3600;
+  // const hour = 1800;
   const currentTime = moment().unix();
   const cookingBufferInSec = cookingTime * 60;
   const bookingStartsFrom = currentTime + cookingBufferInSec;
@@ -27,6 +29,7 @@ const genTS = (data) => {
   const hourlySlots = [];
   //  const halfHourlySlots = []
   // const currentTime = 1677580266;
+  const isRestrictedDay = moment(selectedDate).format("dddd") === restrictedDay
   for (let i = currentStartTimeEpoch; i <= currentEndTimeEpoch; i = i + hour) {
     const startTimeEpoch = i;
     const endTimeEpoch = i + hour;
@@ -37,7 +40,6 @@ const genTS = (data) => {
       .format('LLLL')
       .split(' ')[5];
     const endFormat = moment.unix(endTimeEpoch).format('LLLL').split(' ')[5];
-    //  const isFallingUnderCurrentTime = currentTime >= startTimeEpoch && currentTime <= endTimeEpoch;
     const isFallingUnderCurrentTime =
       startTimeEpoch <= currentTime || endTimeEpoch <= currentTime;
     const isFallingUnderBufferTime =
@@ -50,22 +52,23 @@ const genTS = (data) => {
     const timeSlot = {
       startTimeEpoch,
       endTimeEpoch,
-      active: active && !isFallingUnderCurrentTime && !isFallingUnderBufferTime,
+      active: !isRestrictedDay && (active && !isFallingUnderCurrentTime && !isFallingUnderBufferTime),
       start: `${start} ${startFormat}`,
       end: `${end} ${endFormat}`,
       restrictedStartTimeEpoch,
       restrictedEndTimeEpoch,
     };
-    // console.log(
-    //   'isFallingUnderBufferTime',
-    //   {
-    //     isFallingUnderCurrentTime,
-    //     isFallingUnderBufferTime,
-    //     startTimeEpoch,
-    //     endTimeEpoch,
-    //   },
-    //   timeSlot
-    // );
+    console.log(
+      'isFallingUnderBufferTime',
+      {
+        isFallingUnderCurrentTime,
+        isFallingUnderBufferTime,
+        startTimeEpoch,
+        endTimeEpoch,
+      },
+      timeSlot,
+      isRestrictedDay
+    );
     hourlySlots.push(timeSlot);
   }
   console.log('data', { ...data, bookingStartsFrom });
@@ -136,12 +139,14 @@ const endTimeList = [
 ];
 
 export default function App() {
+  const cookingTime = 30;
+  const restrictedDay = "Wednesday"
   const [days, setDays] = useState([]);
   const [selectedDay, setSelectedDay] = useState();
   const [startTime, setStartTime] = useState(startTimeList[0]);
   const [endTime, setEndTime] = useState(endTimeList[endTimeList.length-1]);
-  const [restrictedStartTime, setRestrictedStartTime] = useState();
-  const [restrictedEndTime, setRestrictedEndTime] = useState();
+  const [restrictedStartTime, setRestrictedStartTime] = useState('05:00:01 AM');
+  const [restrictedEndTime, setRestrictedEndTime] = useState('05:00:59 AM');
   const generateDays = () => {
     const dates = [];
     for (let i = 0; i < 7; i++) {
@@ -166,7 +171,8 @@ export default function App() {
     endTime,
     restrictedStartTime,
     restrictedEndTime,
-    cookingTime: 30,
+    cookingTime,
+    restrictedDay,
   });
   console.log('----slots', slots, days, selectedDay);
 
@@ -258,13 +264,14 @@ export default function App() {
         </select>
       }
       <hr />
-      <div>Date {selectedDay}</div>
+      <div>Date {selectedDay} {moment(selectedDay).format('dddd')}</div>
       <div>
         Start & End: {startTime} - {endTime}
       </div>
       <div>
         InActive Hours: {restrictedStartTime} - {restrictedEndTime}
       </div>
+      <div>Cooking time - {cookingTime} minutes</div>
       <hr />
       {slots.slots.map((slot, i) => (
         <li key={i}>
