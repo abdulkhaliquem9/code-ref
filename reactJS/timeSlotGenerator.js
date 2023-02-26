@@ -138,8 +138,10 @@ const endTimeList = [
 export default function App() {
   const [days, setDays] = useState([]);
   const [selectedDay, setSelectedDay] = useState();
-  const [selectedFromTime, setSelectedFromTime] =useState()
-  const [selectedToTime, setSelectedToTime] = useState()
+  const [startTime, setStartTime] =useState()
+  const [endTime, setEndTime] = useState()
+  const [restrictedStartTime, setRestrictedStartTime] = useState()
+  const [restrictedEndTime, setRestrictedEndTime] = useState()
   const generateDays = () => {
     const dates = [];
     for (let i = 0; i < 7; i++) {
@@ -157,24 +159,13 @@ export default function App() {
   const onDaySelect = (date) => {
     setSelectedDay(date);
   };
-  
-  // const slots = generateDailyTimeSlots({
-  //   selectedDate: moment('FEB 28 2023').format('MMM DD YYYY'),
-  //   restrictedDeliveryStartTime: '04:00 PM',
-  //   restrictedDeliveryEndTime: '08:00 PM',
-  //   startTimeRef: 9,
-  //   endTimeRef: 20,
-  //   cookingTime: 45,
-  //   isCurrentDayRef: { current: true },
-  // });
 
   const slots = genTS({
-    // selectedDate: moment('FEB 28 2023').format('MMM DD YYYY'),
     selectedDate: moment(selectedDay).format('MMM DD YYYY'),
-    startTime: '01:00:01 AM',
-    endTime: '10:00:59 PM',
-    restrictedStartTime: '7:00:01 AM',
-    restrictedEndTime: '7:59:59 AM',
+    startTime,
+    endTime,
+    restrictedStartTime,
+    restrictedEndTime,
     cookingTime: 45,
   });
   console.log('----slots', slots, days, selectedDay);
@@ -195,9 +186,10 @@ export default function App() {
         ))}
       </div>
       <hr/>
+      <div>Start And End Time</div>
       <label>From</label>
       {
-        <select name="from" id="from"  onChange={e=>{setSelectedFromTime(e.target.value)}}>
+        <select name="from" id="from"  onChange={e=>{setStartTime(e.target.value)}}>
           {
            startTimeList.map(t => <option key={t} value={t}>{t}</option>)
           }
@@ -206,7 +198,27 @@ export default function App() {
       <br/>
       <label>To</label>
       {
-        <select name="to" id="to"  onChange={e=>{setSelectedToTime(e.target.value)}}>
+        <select name="to" id="to"  onChange={e=>{setEndTime(e.target.value)}}>
+          {
+           endTimeList.map(t => <option key={t} value={t}>{t}</option>)
+          }
+      </select>
+      }
+      <hr/>
+
+      <div>Restricted Start And End Time</div>
+      <label>From</label>
+      {
+        <select name="from" id="from"  onChange={e=>{setRestrictedStartTime(e.target.value)}}>
+          {
+           startTimeList.map(t => <option key={t} value={t}>{t}</option>)
+          }
+      </select>
+      }
+      <br/>
+      <label>To</label>
+      {
+        <select name="to" id="to"  onChange={e=>{setRestrictedEndTime(e.target.value)}}>
           {
            endTimeList.map(t => <option key={t} value={t}>{t}</option>)
           }
