@@ -1,6 +1,58 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import './style.css';
+const startTimeList = [
+  '01:00:00 AM',
+  '02:00:00 AM',
+  '03:00:00 AM',
+  '04:00:00 AM',
+  '05:00:00 AM',
+  '06:00:00 AM',
+  '07:00:00 AM',
+  '08:00:00 AM',
+  '09:00:00 AM',
+  '10:00:00 AM',
+  '11:00:00 AM',
+  '12:00:00 AM',
+  '01:00:00 PM',
+  '02:00:00 PM',
+  '03:00:00 PM',
+  '04:00:00 PM',
+  '05:00:00 PM',
+  '06:00:00 PM',
+  '07:00:00 PM',
+  '08:00:00 PM',
+  '09:00:00 PM',
+  '10:00:00 PM',
+  '11:00:00 PM',
+  '12:00:00 PM',
+];
+const endTimeList = [
+  '01:00:60 AM',
+  '02:00:60 AM',
+  '03:00:60 AM',
+  '04:00:60 AM',
+  '05:00:60 AM',
+  '06:00:60 AM',
+  '07:00:60 AM',
+  '08:00:60 AM',
+  '09:00:60 AM',
+  '10:00:60 AM',
+  '11:00:60 AM',
+  '12:00:60 AM',
+  '01:00:60 PM',
+  '02:00:60 PM',
+  '03:00:60 PM',
+  '04:00:60 PM',
+  '05:00:60 PM',
+  '06:00:60 PM',
+  '07:00:60 PM',
+  '08:00:60 PM',
+  '09:00:60 PM',
+  '10:00:60 PM',
+  '11:00:60 PM',
+  '12:00:60 PM',
+];
 
 const genTS = (data) => {
   const {
@@ -42,13 +94,17 @@ const genTS = (data) => {
     const endFormat = moment.unix(endTimeEpoch).format('LLLL').split(' ')[5];
     const isFallingUnderCurrentTime =
       startTimeEpoch <= currentTime || endTimeEpoch <= currentTime;
+      
     const isFallingUnderBufferTime =
       bookingStartsFrom >= startTimeEpoch && bookingStartsFrom <= endTimeEpoch;
+
     const active =
-      (startTimeEpoch < restrictedStartTimeEpoch &&
-        endTimeEpoch < restrictedStartTimeEpoch) ||
-      (startTimeEpoch > restrictedEndTimeEpoch &&
-        endTimeEpoch > restrictedEndTimeEpoch);
+      (startTimeEpoch <= restrictedStartTimeEpoch &&
+        endTimeEpoch <= restrictedStartTimeEpoch) ||
+      (startTimeEpoch >= restrictedEndTimeEpoch &&
+        endTimeEpoch >= restrictedEndTimeEpoch);
+
+        console.log('active: ',{start: `${start} ${startFormat}`, end: `${end} ${endFormat}`, startTimeEpoch, endTimeEpoch, restrictedStartTimeEpoch, restrictedEndTimeEpoch})
     const timeSlot = {
       startTimeEpoch,
       endTimeEpoch,
@@ -58,17 +114,17 @@ const genTS = (data) => {
       restrictedStartTimeEpoch,
       restrictedEndTimeEpoch,
     };
-    console.log(
-      'isFallingUnderBufferTime',
-      {
-        isFallingUnderCurrentTime,
-        isFallingUnderBufferTime,
-        startTimeEpoch,
-        endTimeEpoch,
-      },
-      timeSlot,
-      isRestrictedDay
-    );
+    // console.log(
+    //   'isFallingUnderBufferTime',
+    //   {
+    //     isFallingUnderCurrentTime,
+    //     isFallingUnderBufferTime,
+    //     startTimeEpoch,
+    //     endTimeEpoch,
+    //   },
+    //   timeSlot,
+    //   isRestrictedDay
+    // );
     hourlySlots.push(timeSlot);
   }
   console.log('data', { ...data, bookingStartsFrom });
@@ -84,60 +140,6 @@ const genTS = (data) => {
   };
 };
 
-const startTimeList = [
-  '01:00:01 AM',
-  '02:00:01 AM',
-  '03:00:01 AM',
-  '04:00:01 AM',
-  '05:00:01 AM',
-  '06:00:01 AM',
-  '07:00:01 AM',
-  '08:00:01 AM',
-  '09:00:01 AM',
-  '10:00:01 AM',
-  '11:00:01 AM',
-  '12:00:01 AM',
-  '01:00:01 PM',
-  '02:00:01 PM',
-  '03:00:01 PM',
-  '04:00:01 PM',
-  '05:00:01 PM',
-  '06:00:01 PM',
-  '07:00:01 PM',
-  '08:00:01 PM',
-  '09:00:01 PM',
-  '10:00:01 PM',
-  '11:00:01 PM',
-  '12:00:01 PM',
-];
-
-const endTimeList = [
-  '01:00:59 AM',
-  '02:00:59 AM',
-  '03:00:59 AM',
-  '04:00:59 AM',
-  '05:00:59 AM',
-  '06:00:59 AM',
-  '07:00:59 AM',
-  '08:00:59 AM',
-  '09:00:59 AM',
-  '10:00:59 AM',
-  '11:00:59 AM',
-  '12:00:59 AM',
-  '01:00:59 PM',
-  '02:00:59 PM',
-  '03:00:59 PM',
-  '04:00:59 PM',
-  '05:00:59 PM',
-  '06:00:59 PM',
-  '07:00:59 PM',
-  '08:00:59 PM',
-  '09:00:59 PM',
-  '10:00:59 PM',
-  '11:00:59 PM',
-  '12:00:59 PM',
-];
-
 export default function App() {
   const cookingTime = 30;
   const restrictedDay = "Wednesday"
@@ -145,8 +147,8 @@ export default function App() {
   const [selectedDay, setSelectedDay] = useState();
   const [startTime, setStartTime] = useState(startTimeList[0]);
   const [endTime, setEndTime] = useState(endTimeList[endTimeList.length-1]);
-  const [restrictedStartTime, setRestrictedStartTime] = useState('05:00:01 AM');
-  const [restrictedEndTime, setRestrictedEndTime] = useState('05:00:59 AM');
+  const [restrictedStartTime, setRestrictedStartTime] = useState('05:00:00 AM');
+  const [restrictedEndTime, setRestrictedEndTime] = useState('05:00:60 AM');
   const generateDays = () => {
     const dates = [];
     for (let i = 0; i < 7; i++) {
