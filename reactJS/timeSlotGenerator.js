@@ -82,7 +82,11 @@ const genTS = (data) => {
   //  const halfHourlySlots = []
   // const currentTime = 1677580266;
   const isRestrictedDay = moment(selectedDate).format("dddd") === restrictedDay
+
+  //generate slots with in the start and end time
   for (let i = currentStartTimeEpoch; i <= currentEndTimeEpoch; i = i + hour) {
+    // time slot should be with in the end time / less than the end time
+    if(i >= currentStartTimeEpoch && i < currentEndTimeEpoch){
     const startTimeEpoch = i;
     const endTimeEpoch = i + hour;
     const start = moment.unix(startTimeEpoch).format('LLLL').split(' ')[4];
@@ -127,6 +131,8 @@ const genTS = (data) => {
     // );
     hourlySlots.push(timeSlot);
   }
+  }
+
   console.log('data', { ...data, bookingStartsFrom });
   return {
     selectedDate,
