@@ -28,44 +28,44 @@ const startTimeList = [
   '12:00:00 PM',
 ];
 const endTimeList = [
-  '01:00:60 AM',
-  '02:00:60 AM',
-  '03:00:60 AM',
-  '04:00:60 AM',
-  '05:00:60 AM',
-  '06:00:60 AM',
-  '07:00:60 AM',
-  '08:00:60 AM',
-  '09:00:60 AM',
-  '10:00:60 AM',
-  '11:00:60 AM',
-  '12:00:60 AM',
-  '01:00:60 PM',
-  '02:00:60 PM',
-  '03:00:60 PM',
-  '04:00:60 PM',
-  '05:00:60 PM',
-  '06:00:60 PM',
-  '07:00:60 PM',
-  '08:00:60 PM',
-  '09:00:60 PM',
-  '10:00:60 PM',
-  '11:00:60 PM',
-  '12:00:60 PM',
+  '01:60:00 AM',
+  '02:60:00 AM',
+  '03:60:00 AM',
+  '04:60:00 AM',
+  '05:60:00 AM',
+  '06:60:00 AM',
+  '07:60:00 AM',
+  '08:60:00 AM',
+  '09:60:00 AM',
+  '10:60:00 AM',
+  '11:60:00 AM',
+  '12:60:00 AM',
+  '01:60:00 PM',
+  '02:60:00 PM',
+  '03:60:00 PM',
+  '04:60:00 PM',
+  '05:60:00 PM',
+  '06:60:00 PM',
+  '07:60:00 PM',
+  '08:60:00 PM',
+  '09:60:00 PM',
+  '10:60:00 PM',
+  '11:60:00 PM',
+  '12:60:00 PM',
 ];
 
 const genTS = (data) => {
   const {
     selectedDate,
-    startTime = '01:00: 01 AM',
-    endTime = '10:00:59 PM',
-    restrictedStartTime = '7:00:01 AM',
-    restrictedEndTime = '7:59:59 AM',
+    startTime = '01:00: 00 AM',
+    endTime = '10:60:00 PM',
+    restrictedStartTime = '7:00:00 AM',
+    restrictedEndTime = '7:60:00 AM',
     cookingTime = 45,
     restrictedDay = 'Wednesday',
   } = data;
-  const hour = 3600;
-  // const hour = 1800;
+  // const hour = 3600;
+  const hour = 1800;
   const currentTime = moment().unix();
   const cookingBufferInSec = cookingTime * 60;
   const bookingStartsFrom = currentTime + cookingBufferInSec;
@@ -148,7 +148,7 @@ export default function App() {
   const [startTime, setStartTime] = useState(startTimeList[0]);
   const [endTime, setEndTime] = useState(endTimeList[endTimeList.length-1]);
   const [restrictedStartTime, setRestrictedStartTime] = useState('05:00:00 AM');
-  const [restrictedEndTime, setRestrictedEndTime] = useState('05:00:60 AM');
+  const [restrictedEndTime, setRestrictedEndTime] = useState('05:60:00 AM');
   const generateDays = () => {
     const dates = [];
     for (let i = 0; i < 7; i++) {
