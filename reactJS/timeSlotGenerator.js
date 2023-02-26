@@ -56,16 +56,16 @@ const genTS = (data) => {
       restrictedStartTimeEpoch,
       restrictedEndTimeEpoch,
     };
-    console.log(
-      'isFallingUnderBufferTime',
-      {
-        isFallingUnderCurrentTime,
-        isFallingUnderBufferTime,
-        startTimeEpoch,
-        endTimeEpoch,
-      },
-      timeSlot
-    );
+    // console.log(
+    //   'isFallingUnderBufferTime',
+    //   {
+    //     isFallingUnderCurrentTime,
+    //     isFallingUnderBufferTime,
+    //     startTimeEpoch,
+    //     endTimeEpoch,
+    //   },
+    //   timeSlot
+    // );
     hourlySlots.push(timeSlot);
   }
   console.log('data', { ...data, bookingStartsFrom });
@@ -106,7 +106,7 @@ const startTimeList = [
   '10:00:01 PM',
   '11:00:01 PM',
   '12:00:01 PM',
-]
+];
 
 const endTimeList = [
   '01:00:59 AM',
@@ -133,15 +133,15 @@ const endTimeList = [
   '10:00:59 PM',
   '11:00:59 PM',
   '12:00:59 PM',
-]
+];
 
 export default function App() {
   const [days, setDays] = useState([]);
   const [selectedDay, setSelectedDay] = useState();
-  const [startTime, setStartTime] =useState()
-  const [endTime, setEndTime] = useState()
-  const [restrictedStartTime, setRestrictedStartTime] = useState()
-  const [restrictedEndTime, setRestrictedEndTime] = useState()
+  const [startTime, setStartTime] = useState(startTimeList[0]);
+  const [endTime, setEndTime] = useState(endTimeList[endTimeList.length-1]);
+  const [restrictedStartTime, setRestrictedStartTime] = useState();
+  const [restrictedEndTime, setRestrictedEndTime] = useState();
   const generateDays = () => {
     const dates = [];
     for (let i = 0; i < 7; i++) {
@@ -166,7 +166,7 @@ export default function App() {
     endTime,
     restrictedStartTime,
     restrictedEndTime,
-    cookingTime: 45,
+    cookingTime: 30,
   });
   console.log('----slots', slots, days, selectedDay);
 
@@ -185,46 +185,87 @@ export default function App() {
           </button>
         ))}
       </div>
-      <hr/>
+      <hr />
       <div>Start And End Time</div>
       <label>From</label>
       {
-        <select name="from" id="from"  onChange={e=>{setStartTime(e.target.value)}}>
-          {
-           startTimeList.map(t => <option key={t} value={t}>{t}</option>)
-          }
-      </select>
+        <select
+          name="from"
+          id="from"
+          onChange={(e) => {
+            console.log('From', e.target.value)
+            setStartTime(e.target.value);
+          }}
+        >
+          {startTimeList.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
+        </select>
       }
-      <br/>
+      <br />
       <label>To</label>
       {
-        <select name="to" id="to"  onChange={e=>{setEndTime(e.target.value)}}>
-          {
-           endTimeList.map(t => <option key={t} value={t}>{t}</option>)
-          }
-      </select>
+        <select
+          name="to"
+          id="to"
+          onChange={(e) => {
+            console.log('To', e.target.value)
+            setEndTime(e.target.value);
+          }}
+        >
+          {endTimeList.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
+        </select>
       }
-      <hr/>
-
+      <hr />
       <div>Restricted Start And End Time</div>
       <label>From</label>
       {
-        <select name="from" id="from"  onChange={e=>{setRestrictedStartTime(e.target.value)}}>
-          {
-           startTimeList.map(t => <option key={t} value={t}>{t}</option>)
-          }
-      </select>
+        <select
+          name="from"
+          id="from"
+          onChange={(e) => {
+            setRestrictedStartTime(e.target.value);
+          }}
+        >
+          {startTimeList.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
+        </select>
       }
-      <br/>
+      <br />
       <label>To</label>
       {
-        <select name="to" id="to"  onChange={e=>{setRestrictedEndTime(e.target.value)}}>
-          {
-           endTimeList.map(t => <option key={t} value={t}>{t}</option>)
-          }
-      </select>
+        <select
+          name="to"
+          id="to"
+          onChange={(e) => {
+            setRestrictedEndTime(e.target.value);
+          }}
+        >
+          {endTimeList.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
+        </select>
       }
-      <hr/>
+      <hr />
+      <div>Date {selectedDay}</div>
+      <div>
+        Start & End: {startTime} - {endTime}
+      </div>
+      <div>
+        InActive Hours: {restrictedStartTime} - {restrictedEndTime}
+      </div>
+      <hr />
       {slots.slots.map((slot, i) => (
         <li key={i}>
           <span>
@@ -240,6 +281,4 @@ export default function App() {
   );
 }
 
-
-
-// https://stackblitz.com/edit/react-ts-cddjue?file=App.tsx
+// https://stackblitz.com/edit/react-ts-tfadya?file=App.tsx,index.tsx
