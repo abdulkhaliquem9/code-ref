@@ -81,9 +81,65 @@ const genTS = (data) => {
   };
 };
 
+const startTimeList = [
+  '01:00:01 AM',
+  '02:00:01 AM',
+  '03:00:01 AM',
+  '04:00:01 AM',
+  '05:00:01 AM',
+  '06:00:01 AM',
+  '07:00:01 AM',
+  '08:00:01 AM',
+  '09:00:01 AM',
+  '10:00:01 AM',
+  '11:00:01 AM',
+  '12:00:01 AM',
+  '01:00:01 PM',
+  '02:00:01 PM',
+  '03:00:01 PM',
+  '04:00:01 PM',
+  '05:00:01 PM',
+  '06:00:01 PM',
+  '07:00:01 PM',
+  '08:00:01 PM',
+  '09:00:01 PM',
+  '10:00:01 PM',
+  '11:00:01 PM',
+  '12:00:01 PM',
+]
+
+const endTimeList = [
+  '01:00:59 AM',
+  '02:00:59 AM',
+  '03:00:59 AM',
+  '04:00:59 AM',
+  '05:00:59 AM',
+  '06:00:59 AM',
+  '07:00:59 AM',
+  '08:00:59 AM',
+  '09:00:59 AM',
+  '10:00:59 AM',
+  '11:00:59 AM',
+  '12:00:59 AM',
+  '01:00:59 PM',
+  '02:00:59 PM',
+  '03:00:59 PM',
+  '04:00:59 PM',
+  '05:00:59 PM',
+  '06:00:59 PM',
+  '07:00:59 PM',
+  '08:00:59 PM',
+  '09:00:59 PM',
+  '10:00:59 PM',
+  '11:00:59 PM',
+  '12:00:59 PM',
+]
+
 export default function App() {
   const [days, setDays] = useState([]);
   const [selectedDay, setSelectedDay] = useState();
+  const [selectedFromTime, setSelectedFromTime] =useState()
+  const [selectedToTime, setSelectedToTime] = useState()
   const generateDays = () => {
     const dates = [];
     for (let i = 0; i < 7; i++) {
@@ -101,6 +157,7 @@ export default function App() {
   const onDaySelect = (date) => {
     setSelectedDay(date);
   };
+  
   // const slots = generateDailyTimeSlots({
   //   selectedDate: moment('FEB 28 2023').format('MMM DD YYYY'),
   //   restrictedDeliveryStartTime: '04:00 PM',
@@ -114,7 +171,7 @@ export default function App() {
   const slots = genTS({
     // selectedDate: moment('FEB 28 2023').format('MMM DD YYYY'),
     selectedDate: moment(selectedDay).format('MMM DD YYYY'),
-    startTime: '01:00: 01 AM',
+    startTime: '01:00:01 AM',
     endTime: '10:00:59 PM',
     restrictedStartTime: '7:00:01 AM',
     restrictedEndTime: '7:59:59 AM',
@@ -137,6 +194,25 @@ export default function App() {
           </button>
         ))}
       </div>
+      <hr/>
+      <label>From</label>
+      {
+        <select name="from" id="from"  onChange={e=>{setSelectedFromTime(e.target.value)}}>
+          {
+           startTimeList.map(t => <option key={t} value={t}>{t}</option>)
+          }
+      </select>
+      }
+      <br/>
+      <label>To</label>
+      {
+        <select name="to" id="to"  onChange={e=>{setSelectedToTime(e.target.value)}}>
+          {
+           endTimeList.map(t => <option key={t} value={t}>{t}</option>)
+          }
+      </select>
+      }
+      <hr/>
       {slots.slots.map((slot, i) => (
         <li key={i}>
           <span>
@@ -152,141 +228,6 @@ export default function App() {
   );
 }
 
-const generateDailyTimeSlots = ({
-  selectedDate,
-  restrictedDeliveryStartTime,
-  restrictedDeliveryEndTime,
-  startTimeRef,
-  endTimeRef,
-  cookingTime,
-  isCurrentDayRef = { current: true },
-}) => {
-  let slots = [];
-  let selectedTime = '';
-  const setSlots = (slotsArray) => {
-    slots = slotsArray;
-  };
-  const setSelectedTime = (time) => {
-    selectedTime = time;
-  };
 
-  const roundToNextSlot = (time) => {
-    const start = moment(time);
-    const remainder = 30 - (start.minute() % 30);
-    const dateTime = moment(start).add(remainder, 'minutes').startOf('minute');
-    return dateTime;
-  };
-
-  if (selectedDate) {
-    const parsedDate = moment(selectedDate, 'MMM DD YYYY');
-    const now = moment();
-    // const cookingTime = 45;
-    let dateToConsider = now;
-    let startTime = null;
-    let endTime = null;
-    const restrictedStartTime = restrictedDeliveryStartTime
-      ? moment(
-          selectedDate + ' ' + restrictedDeliveryStartTime,
-          'MMM DD YYYY hh:mm A'
-        )
-      : null;
-    const restrictedEndTime = restrictedDeliveryEndTime
-      ? moment(
-          selectedDate + ' ' + restrictedDeliveryEndTime,
-          'MMM DD YYYY hh:mm A'
-        )
-      : null;
-
-    let STR = moment(dateToConsider).startOf('day');
-    let startTimeReference = STR.add(startTimeRef, 'hours');
-    let endTimeReference = moment(dateToConsider)
-      .startOf('day')
-      .add(endTimeRef, 'hours');
-
-    console.log('st', {
-      STR,
-      restrictedStartTime,
-      restrictedEndTime,
-      startTimeReference,
-      endTimeReference,
-    });
-    if (
-      moment(parsedDate).startOf('day').format('DD MMM YYYY') !==
-      moment().startOf('day').format('DD MMM YYYY')
-    ) {
-      dateToConsider = moment(parsedDate);
-      startTimeReference = moment(dateToConsider)
-        .startOf('day')
-        .add(startTimeRef, 'hours');
-      endTimeReference = moment(dateToConsider)
-        .startOf('day')
-        .add(endTimeRef, 'hours');
-      isCurrentDayRef.current = false;
-    }
-    if (moment(dateToConsider) > endTimeReference) {
-      setSlots([]);
-      setSelectedTime('');
-    } else {
-      if (moment(dateToConsider) > startTimeReference) {
-        startTime = roundToNextSlot(
-          moment(dateToConsider).add(cookingTime, 'minute')
-        );
-      } else {
-        startTime = roundToNextSlot(
-          startTimeReference.add(cookingTime, 'minute')
-        );
-      }
-
-      endTime = roundToNextSlot(
-        endTimeReference.add(cookingTime + 60, 'minute')
-      );
-      const hours = moment.duration(endTime.diff(startTime)).asHours();
-      if (hours < 0) {
-        setSlots([]);
-        setSelectedTime('');
-      } else {
-        const _slots = [];
-        for (let i = 0; i < parseInt(hours, 10); i++) {
-          const firstTime = moment(startTime).add(i * 60, 'minute');
-          const secondTime = moment(startTime).add((i + 1) * 60, 'minute');
-          if (
-            !(
-              restrictedStartTime &&
-              restrictedEndTime &&
-              (restrictedStartTime.isBetween(
-                firstTime,
-                secondTime,
-                null,
-                '[)'
-              ) ||
-                restrictedEndTime.isBetween(firstTime, secondTime, null, '(]'))
-            )
-          ) {
-            _slots.push({
-              label: `${moment(firstTime).format('h.mm')} - ${moment(
-                secondTime
-              ).format('h.mm A')}`,
-              status: 'normal',
-            });
-          }
-        }
-
-        if (selectedTime) {
-          const selectedSlot = _slots.find(
-            (slot) => slot.label === selectedTime
-          );
-          if (selectedSlot) {
-            selectedSlot.status = 'active';
-          }
-        } else {
-          _slots[0].status = 'active';
-          setSelectedTime(_slots[0].label);
-        }
-        setSlots([..._slots]);
-      }
-    }
-  }
-  return slots;
-};
 
 // https://stackblitz.com/edit/react-ts-cddjue?file=App.tsx
