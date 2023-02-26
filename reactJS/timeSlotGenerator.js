@@ -1,45 +1,74 @@
- import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import './style.css';
 
 const genTS = (data) => {
   const {
-    selectedDate, 
-    startTime = '01:00: 01 AM', 
-    endTime = '10:00:59 PM', 
+    selectedDate,
+    startTime = '01:00: 01 AM',
+    endTime = '10:00:59 PM',
     restrictedStartTime = '7:00:01 AM',
-  restrictedEndTime = '7:59:59 AM',
-  cookingTime = 45
-   } = data
-   const hour = 3600;
-   const currentTime = moment().unix();
-   const cookingBufferInSec = cookingTime * 60
-   const bookingStartsFrom = currentTime + cookingBufferInSec;
-   const selectedDateEpoch = moment(selectedDate,'MMM DD YYYY').unix();
-   const currentStartTimeEpoch = moment(`${selectedDate} ${startTime}`).unix();
-   const currentEndTimeEpoch = moment(`${selectedDate} ${endTime}`).unix();
-   const restrictedStartTimeEpoch = moment(`${selectedDate} ${restrictedStartTime}`).unix();
-   const restrictedEndTimeEpoch = moment(`${selectedDate} ${restrictedEndTime}`).unix();
-   const hourlySlots = []
+    restrictedEndTime = '7:59:59 AM',
+    cookingTime = 45,
+  } = data;
+  const hour = 3600;
+  const currentTime = moment().unix();
+  const cookingBufferInSec = cookingTime * 60;
+  const bookingStartsFrom = currentTime + cookingBufferInSec;
+  const selectedDateEpoch = moment(selectedDate, 'MMM DD YYYY').unix();
+  const currentStartTimeEpoch = moment(`${selectedDate} ${startTime}`).unix();
+  const currentEndTimeEpoch = moment(`${selectedDate} ${endTime}`).unix();
+  const restrictedStartTimeEpoch = moment(
+    `${selectedDate} ${restrictedStartTime}`
+  ).unix();
+  const restrictedEndTimeEpoch = moment(
+    `${selectedDate} ${restrictedEndTime}`
+  ).unix();
+  const hourlySlots = [];
   //  const halfHourlySlots = []
   // const currentTime = 1677580266;
-   for(let i = currentStartTimeEpoch; i <= currentEndTimeEpoch; i = i+hour ){
-     const startTimeEpoch = i;
-     const endTimeEpoch = i + hour
-     const start = moment.unix(startTimeEpoch).format('LLLL').split(" ")[4];
-     const end = moment.unix(endTimeEpoch).format('LLLL').split(" ")[4];
-     const startFormat = moment.unix(startTimeEpoch).format('LLLL').split(" ")[5];
-     const endFormat = moment.unix(endTimeEpoch).format('LLLL').split(" ")[5];
+  for (let i = currentStartTimeEpoch; i <= currentEndTimeEpoch; i = i + hour) {
+    const startTimeEpoch = i;
+    const endTimeEpoch = i + hour;
+    const start = moment.unix(startTimeEpoch).format('LLLL').split(' ')[4];
+    const end = moment.unix(endTimeEpoch).format('LLLL').split(' ')[4];
+    const startFormat = moment
+      .unix(startTimeEpoch)
+      .format('LLLL')
+      .split(' ')[5];
+    const endFormat = moment.unix(endTimeEpoch).format('LLLL').split(' ')[5];
     //  const isFallingUnderCurrentTime = currentTime >= startTimeEpoch && currentTime <= endTimeEpoch;
-    const isFallingUnderCurrentTime = startTimeEpoch <= currentTime || endTimeEpoch <= currentTime;
-    const isFallingUnderBufferTime = bookingStartsFrom >= startTimeEpoch && bookingStartsFrom <= endTimeEpoch;
-    const active = (startTimeEpoch < restrictedStartTimeEpoch &&  endTimeEpoch < restrictedStartTimeEpoch) || (startTimeEpoch > restrictedEndTimeEpoch && endTimeEpoch > restrictedEndTimeEpoch)  ;
-    const timeSlot = {startTimeEpoch, endTimeEpoch, active : active && !isFallingUnderCurrentTime && !isFallingUnderBufferTime  , start: `${start} ${startFormat}`, end: `${end} ${endFormat}`, restrictedStartTimeEpoch,
-    restrictedEndTimeEpoch,};
-    console.log('isFallingUnderBufferTime', {isFallingUnderCurrentTime,isFallingUnderBufferTime, startTimeEpoch, endTimeEpoch}, timeSlot)
-    hourlySlots.push(timeSlot)
-   }
-   console.log('data', {...data, bookingStartsFrom})
+    const isFallingUnderCurrentTime =
+      startTimeEpoch <= currentTime || endTimeEpoch <= currentTime;
+    const isFallingUnderBufferTime =
+      bookingStartsFrom >= startTimeEpoch && bookingStartsFrom <= endTimeEpoch;
+    const active =
+      (startTimeEpoch < restrictedStartTimeEpoch &&
+        endTimeEpoch < restrictedStartTimeEpoch) ||
+      (startTimeEpoch > restrictedEndTimeEpoch &&
+        endTimeEpoch > restrictedEndTimeEpoch);
+    const timeSlot = {
+      startTimeEpoch,
+      endTimeEpoch,
+      active: active && !isFallingUnderCurrentTime && !isFallingUnderBufferTime,
+      start: `${start} ${startFormat}`,
+      end: `${end} ${endFormat}`,
+      restrictedStartTimeEpoch,
+      restrictedEndTimeEpoch,
+    };
+    console.log(
+      'isFallingUnderBufferTime',
+      {
+        isFallingUnderCurrentTime,
+        isFallingUnderBufferTime,
+        startTimeEpoch,
+        endTimeEpoch,
+      },
+      timeSlot
+    );
+    hourlySlots.push(timeSlot);
+  }
+  console.log('data', { ...data, bookingStartsFrom });
   return {
     selectedDate,
     selectedDateEpoch,
@@ -49,10 +78,29 @@ const genTS = (data) => {
     restrictedEndTimeEpoch,
     slots: hourlySlots,
     currentTime,
-  }
-}
+  };
+};
 
 export default function App() {
+  const [days, setDays] = useState([]);
+  const [selectedDay, setSelectedDay] = useState();
+  const generateDays = () => {
+    const dates = [];
+    for (let i = 0; i < 7; i++) {
+      let currentDay = moment().add(i, 'days').format('MMM DD YYYY');
+      // console.log('c', currentDay)
+      dates.push(currentDay);
+    }
+    setDays(dates);
+    setSelectedDay(dates[0]);
+  };
+  useEffect(() => {
+    generateDays();
+  }, []);
+
+  const onDaySelect = (date) => {
+    setSelectedDay(date);
+  };
   // const slots = generateDailyTimeSlots({
   //   selectedDate: moment('FEB 28 2023').format('MMM DD YYYY'),
   //   restrictedDeliveryStartTime: '04:00 PM',
@@ -65,18 +113,38 @@ export default function App() {
 
   const slots = genTS({
     // selectedDate: moment('FEB 28 2023').format('MMM DD YYYY'),
-    selectedDate: moment().format('MMM DD YYYY'),
-  })
-  console.log('----slots', slots);
+    selectedDate: moment(selectedDay).format('MMM DD YYYY'),
+    startTime: '01:00: 01 AM',
+    endTime: '10:00:59 PM',
+    restrictedStartTime: '7:00:01 AM',
+    restrictedEndTime: '7:59:59 AM',
+    cookingTime: 45,
+  });
+  console.log('----slots', slots, days, selectedDay);
 
   return (
     <div>
-      <h1>Hello StackBlitz!</h1>
-      <p>Start editing to see some magic happen :)</p>
+      <div>
+        {days.map((day) => (
+          <button
+            key={day}
+            onClick={() => {
+              onDaySelect(day);
+            }}
+          >
+            <span>{day}</span>
+            <span></span>
+          </button>
+        ))}
+      </div>
       {slots.slots.map((slot, i) => (
         <li key={i}>
           <span>
-            {!slot.active ? <strike>{`${slot.start} - ${slot.end}`}</strike> : <b>{`${slot.start} - ${slot.end}`}</b>}
+            {!slot.active ? (
+              <strike>{`${slot.start} - ${slot.end}`}</strike>
+            ) : (
+              <b>{`${slot.start} - ${slot.end}`}</b>
+            )}
           </span>
         </li>
       ))}
@@ -220,6 +288,5 @@ const generateDailyTimeSlots = ({
   }
   return slots;
 };
-
 
 // https://stackblitz.com/edit/react-ts-cddjue?file=App.tsx
